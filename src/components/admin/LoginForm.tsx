@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useToast, Toast } from '@/src/components/ui/Toast'
 
@@ -15,6 +15,8 @@ function validatePassword(password: string): boolean {
 
 export function LoginForm() {
   const toast = useToast()
+  const emailRef = useRef<HTMLInputElement>(null)
+  const passwordRef = useRef<HTMLInputElement>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -23,6 +25,22 @@ export function LoginForm() {
     email: false,
     password: false,
   })
+
+  const handleEmailInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value
+    if (value !== email) {
+      setEmail(value)
+      setTouched((prev) => ({ ...prev, email: true }))
+    }
+  }
+
+  const handlePasswordInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value
+    if (value !== password) {
+      setPassword(value)
+      setTouched((prev) => ({ ...prev, password: true }))
+    }
+  }
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -56,8 +74,11 @@ export function LoginForm() {
     }
   }
 
-  const trimmedEmail = email.trim()
-  const trimmedPassword = password.trim()
+  // Verificar valores tanto do estado quanto diretamente dos inputs (para autocomplete)
+  const emailValue = emailRef.current?.value || email
+  const passwordValue = passwordRef.current?.value || password
+  const trimmedEmail = emailValue.trim()
+  const trimmedPassword = passwordValue.trim()
   const isEmailValid = trimmedEmail.length > 0 && validateEmail(trimmedEmail)
   const isPasswordValid = trimmedPassword.length > 0 && validatePassword(trimmedPassword)
   const isFormValid = isEmailValid && isPasswordValid
@@ -85,7 +106,29 @@ export function LoginForm() {
     e.preventDefault()
     setTouched({ email: true, password: true })
 
-    if (!validateForm()) {
+    // Verificar valores diretamente dos inputs caso o estado não tenha sido atualizado
+    const currentEmail = emailRef.current?.value || email
+    const currentPassword = passwordRef.current?.value || password
+    
+    // Atualizar estado se necessário
+    if (currentEmail !== email) {
+      setEmail(currentEmail)
+    }
+    if (currentPassword !== password) {
+      setPassword(currentPassword)
+    }
+
+    // Usar valores atualizados para validação
+    const finalEmail = currentEmail.trim()
+    const finalPassword = currentPassword.trim()
+
+    if (!finalEmail || !validateEmail(finalEmail)) {
+      setErrors((prev) => ({ ...prev, email: 'Email é obrigatório' }))
+      return
+    }
+
+    if (!finalPassword || !validatePassword(finalPassword)) {
+      setErrors((prev) => ({ ...prev, password: 'Senha é obrigatória' }))
       return
     }
 
@@ -98,8 +141,8 @@ export function LoginForm() {
 
     const loginPromise = async () => {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: trimmedEmail,
-        password: trimmedPassword,
+        email: finalEmail,
+        password: finalPassword,
       })
 
       if (error) {
@@ -177,6 +220,23 @@ export function LoginForm() {
     }
   }
 
+  // Detectar valores preenchidos automaticamente pelo navegador (autocomplete)
+  useEffect(() => {
+    // Verificar valores após um pequeno delay para permitir autocomplete
+    const timer = setTimeout(() => {
+      if (emailRef.current && emailRef.current.value && !email) {
+        setEmail(emailRef.current.value)
+        setTouched((prev) => ({ ...prev, email: true }))
+      }
+      if (passwordRef.current && passwordRef.current.value && !password) {
+        setPassword(passwordRef.current.value)
+        setTouched((prev) => ({ ...prev, password: true }))
+      }
+    }, 200)
+
+    return () => clearTimeout(timer)
+  }, [email, password])
+
   const showEmailError = touched.email && errors.email
   const showPasswordError = touched.password && errors.password
 
@@ -188,10 +248,12 @@ export function LoginForm() {
             Email <span className="text-red-500">*</span>
           </label>
           <input
+            ref={emailRef}
             id="email"
             type="email"
             value={email}
             onChange={handleEmailChange}
+            onInput={handleEmailInput}
             onBlur={handleEmailBlur}
             placeholder="seu@email.com"
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 ${
@@ -202,6 +264,7 @@ export function LoginForm() {
             aria-invalid={!!showEmailError}
             aria-describedby={showEmailError ? 'email-error' : undefined}
             disabled={loading}
+            autoComplete="email"
           />
           {showEmailError && (
             <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
@@ -215,10 +278,12 @@ export function LoginForm() {
             Senha <span className="text-red-500">*</span>
           </label>
           <input
+            ref={passwordRef}
             id="password"
             type="password"
             value={password}
             onChange={handlePasswordChange}
+            onInput={handlePasswordInput}
             onBlur={handlePasswordBlur}
             placeholder="••••••"
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 ${
@@ -229,6 +294,7 @@ export function LoginForm() {
             aria-invalid={!!showPasswordError}
             aria-describedby={showPasswordError ? 'password-error' : undefined}
             disabled={loading}
+            autoComplete="current-password"
           />
           {showPasswordError && (
             <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">
