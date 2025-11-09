@@ -19,7 +19,19 @@ const nextConfig = {
         cookie: false,
       }
     }
+    // Ignorar diretório electron-app no build
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/electron-app/**'],
+    }
     return config
+  },
+  // Excluir electron-app do build
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  experimental: {
+    outputFileTracingExcludes: {
+      '*': ['./electron-app/**/*'],
+    },
   },
 }
 
