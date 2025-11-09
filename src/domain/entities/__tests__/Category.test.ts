@@ -1,7 +1,7 @@
 import { Category } from '../Category'
 
 // Mock Supabase client
-jest.mock('@/lib/supabase/server', () => {
+jest.mock('@/lib/supabase/client', () => {
   const mockSupabase = {
     from: jest.fn(),
   }
@@ -10,7 +10,11 @@ jest.mock('@/lib/supabase/server', () => {
   }
 })
 
-import { supabase as mockSupabase } from '@/lib/supabase/server'
+import { supabase as mockSupabase } from '@/lib/supabase/client'
+
+const supabaseMock = mockSupabase as unknown as {
+  from: jest.Mock
+}
 
 describe('Category', () => {
   const category = new Category(
@@ -55,11 +59,11 @@ describe('Category', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const hasProducts = await category.hasActiveProducts()
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('products')
+      expect(supabaseMock.from).toHaveBeenCalledWith('products')
       expect(mockChain.eq).toHaveBeenCalledWith('category_id', 'cat-1')
       expect(mockChain.eq).toHaveBeenCalledWith('status', 'Ativo')
       expect(hasProducts).toBe(true)
@@ -75,7 +79,7 @@ describe('Category', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const hasProducts = await category.hasActiveProducts()
 
@@ -92,7 +96,7 @@ describe('Category', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       await expect(category.hasActiveProducts()).rejects.toThrow(
         'Error checking active products: Database error'
@@ -124,11 +128,11 @@ describe('Category', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const products = await category.getProducts()
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('products')
+      expect(supabaseMock.from).toHaveBeenCalledWith('products')
       expect(mockChain.eq).toHaveBeenCalledWith('category_id', 'cat-1')
       expect(mockChain.eq).toHaveBeenCalledWith('status', 'Ativo')
       expect(products).toHaveLength(1)
@@ -145,7 +149,7 @@ describe('Category', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const products = await category.getProducts()
 
@@ -162,7 +166,7 @@ describe('Category', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       await expect(category.getProducts()).rejects.toThrow(
         'Error fetching products: Database error'
@@ -203,11 +207,11 @@ describe('Category', () => {
         error: null,
       })
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const categories = await Category.getAllActive()
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('categories')
+      expect(supabaseMock.from).toHaveBeenCalledWith('categories')
       expect(mockChain.eq).toHaveBeenCalledWith('active', true)
       expect(categories).toHaveLength(2)
       expect(categories[0].name).toBe('Entradas')
@@ -226,7 +230,7 @@ describe('Category', () => {
         error: null,
       })
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const categories = await Category.getAllActive()
 
@@ -245,7 +249,7 @@ describe('Category', () => {
         error: { message: 'Database error' },
       })
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       await expect(Category.getAllActive()).rejects.toThrow(
         'Error fetching categories: Database error'

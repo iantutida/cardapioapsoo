@@ -45,7 +45,7 @@ export function TableNumberField({
             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
             : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
         }`}
-        aria-invalid={showError}
+        aria-invalid={!!showError}
         aria-describedby={showError ? 'table-error' : undefined}
       />
       {showError && (

@@ -16,7 +16,7 @@ export function Toast({ open, onOpenChange, title, description }: ToastProps) {
       <ToastPrimitive.Root
         open={open}
         onOpenChange={onOpenChange}
-        className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 data-[state=open]:animate-slideIn data-[state=closed]:animate-slideOut"
+        className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 pointer-events-auto data-[state=open]:animate-slideIn data-[state=closed]:animate-slideOut"
       >
         <ToastPrimitive.Title className="font-semibold text-gray-900">
           {title}
@@ -27,7 +27,7 @@ export function Toast({ open, onOpenChange, title, description }: ToastProps) {
           </ToastPrimitive.Description>
         )}
       </ToastPrimitive.Root>
-      <ToastPrimitive.Viewport className="fixed top-0 right-0 z-[100] flex flex-col gap-2 w-full max-w-sm p-4" />
+      <ToastPrimitive.Viewport className="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-80 max-w-full p-4 pointer-events-none" />
     </ToastPrimitive.Provider>
   )
 }

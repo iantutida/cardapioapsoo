@@ -2,7 +2,7 @@ import { OptionGroup } from '../OptionGroup'
 import { Option } from '../Option'
 
 // Mock Supabase client
-jest.mock('@/lib/supabase/server', () => {
+jest.mock('@/lib/supabase/client', () => {
   const mockSupabase = {
     from: jest.fn(),
   }
@@ -11,7 +11,11 @@ jest.mock('@/lib/supabase/server', () => {
   }
 })
 
-import { supabase as mockSupabase } from '@/lib/supabase/server'
+import { supabase as mockSupabase } from '@/lib/supabase/client'
+
+const supabaseMock = mockSupabase as unknown as {
+  from: jest.Mock
+}
 
 describe('OptionGroup', () => {
   const optionGroup = new OptionGroup(
@@ -79,11 +83,11 @@ describe('OptionGroup', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const options = await optionGroup.getOptions()
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('options')
+      expect(supabaseMock.from).toHaveBeenCalledWith('options')
       expect(mockChain.eq).toHaveBeenCalledWith('option_group_id', 'test-id')
       expect(options).toHaveLength(2)
       expect(options[0]).toBeInstanceOf(Option)
@@ -100,7 +104,7 @@ describe('OptionGroup', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const options = await optionGroup.getOptions()
 
@@ -117,7 +121,7 @@ describe('OptionGroup', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       await expect(optionGroup.getOptions()).rejects.toThrow(
         'Error fetching options: Database error'
@@ -135,11 +139,11 @@ describe('OptionGroup', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const groups = await OptionGroup.getByProductId('non-existent-id')
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('product_option_links')
+      expect(supabaseMock.from).toHaveBeenCalledWith('product_option_links')
       expect(mockChain.eq).toHaveBeenCalledWith('product_id', 'non-existent-id')
       expect(groups).toEqual([])
     })
@@ -168,15 +172,11 @@ describe('OptionGroup', () => {
         },
       ]
 
-      const mockChain = {
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({
-          data: mockData,
-          error: null,
+      supabaseMock.from.mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({ single: jest.fn().mockResolvedValue({ data: mockData, error: null }) }),
         }),
-      }
-
-      mockSupabase.from.mockReturnValue(mockChain)
+      })
 
       const groups = await OptionGroup.getByProductId('product-id')
 
@@ -206,15 +206,13 @@ describe('OptionGroup', () => {
         },
       ]
 
-      const mockChain = {
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({
-          data: mockData,
-          error: null,
+      supabaseMock.from.mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({ data: mockData, error: null })
+          }),
         }),
-      }
-
-      mockSupabase.from.mockReturnValue(mockChain)
+      })
 
       const groups = await OptionGroup.getByProductId('product-id')
 
@@ -231,7 +229,7 @@ describe('OptionGroup', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       await expect(OptionGroup.getByProductId('product-id')).rejects.toThrow(
         'Error fetching option groups: Database error'

@@ -1,7 +1,7 @@
 import { StoreConfig } from '../StoreConfig'
 
 // Mock Supabase client
-jest.mock('@/lib/supabase/server', () => {
+jest.mock('@/lib/supabase/client', () => {
   const mockSupabase = {
     from: jest.fn(),
   }
@@ -10,7 +10,11 @@ jest.mock('@/lib/supabase/server', () => {
   }
 })
 
-import { supabase as mockSupabase } from '@/lib/supabase/server'
+import { supabase as mockSupabase } from '@/lib/supabase/client'
+
+const supabaseMock = mockSupabase as unknown as {
+  from: jest.Mock
+}
 
 describe('StoreConfig', () => {
   const storeConfig = new StoreConfig(
@@ -136,11 +140,11 @@ describe('StoreConfig', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       const settings = await StoreConfig.getSettings()
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('store_settings')
+      expect(supabaseMock.from).toHaveBeenCalledWith('store_settings')
       expect(settings).toBeInstanceOf(StoreConfig)
       expect(settings.getName()).toBe('Restaurante Teste')
       expect(settings.getLogoUrl()).toBe('https://example.com/logo.png')
@@ -156,7 +160,7 @@ describe('StoreConfig', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       await expect(StoreConfig.getSettings()).rejects.toThrow(
         'Error fetching store settings: Database error'
@@ -173,7 +177,7 @@ describe('StoreConfig', () => {
         }),
       }
 
-      mockSupabase.from.mockReturnValue(mockChain)
+      supabaseMock.from.mockReturnValue(mockChain)
 
       await expect(StoreConfig.getSettings()).rejects.toThrow(
         'Store settings not found'

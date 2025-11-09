@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/src/contexts/CartContext'
 import { Order } from '@/src/domain/entities/Order'
@@ -36,7 +36,7 @@ export default function CheckoutPage() {
       router.push('/menu')
       toast.showToast('Carrinho vazio', 'Adicione itens ao carrinho para finalizar o pedido')
     }
-  }, [items.length, router])
+  }, [items.length, router, toast])
 
   const validateForm = (updateErrors: boolean = false): boolean => {
     const newErrors: Record<string, string> = {}
@@ -89,7 +89,7 @@ export default function CheckoutPage() {
         {
           name: orderType === 'Retirada' ? customerName : undefined,
           phone: orderType === 'Retirada' ? customerPhone : undefined,
-          tableNumber: orderType === 'Consumo no Local' ? tableNumber : undefined,
+          tableNumber: orderType === 'Consumo no Local' ? (tableNumber ?? undefined) : undefined,
         },
         orderType!,
         appliedCoupon
@@ -127,7 +127,7 @@ export default function CheckoutPage() {
   const subtotal = getCartTotal()
   const discount = getDiscount()
   const total = getTotal()
-  const isFormValid = useMemo(() => validateForm(false), [orderType, customerName, customerPhone, tableNumber])
+  const isFormValid = validateForm(false)
 
   return (
     <>

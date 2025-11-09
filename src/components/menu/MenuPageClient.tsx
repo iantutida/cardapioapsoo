@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { Category } from '@/src/domain/entities/Category'
-import { Product } from '@/src/domain/entities/Product'
-import { StoreConfig } from '@/src/domain/entities/StoreConfig'
 import { CartItem } from '@/src/types/cart'
 import { Header } from '@/src/components/menu/Header'
 import { CoverSection } from '@/src/components/menu/CoverSection'
@@ -14,10 +12,38 @@ import { ProductDetailModal } from '@/src/components/menu/ProductDetailModal'
 import { FloatingCartButton } from '@/src/components/menu/FloatingCartButton'
 import { CartModal } from '@/src/components/menu/CartModal'
 
+interface CategoryData {
+  id: string
+  name: string
+  order: number
+  active: boolean
+}
+
+interface ProductData {
+  id: string
+  name: string
+  price: number
+  categoryId: string
+  status: string
+  order: number
+  displayPrice: string
+  description?: string
+  photoUrl?: string
+}
+
+interface StoreConfigData {
+  id: string
+  name: string
+  logoUrl: string | null
+  coverUrl: string | null
+  description: string | null
+  openingHours: string | null
+}
+
 interface MenuPageClientProps {
-  categories: Category[]
-  categoryProducts: Map<string, Product[]>
-  storeConfig: StoreConfig
+  categories: CategoryData[]
+  categoryProducts: Map<string, ProductData[]>
+  storeConfig: StoreConfigData
 }
 
 export function MenuPageClient({
