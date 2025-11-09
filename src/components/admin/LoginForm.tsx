@@ -175,8 +175,9 @@ export function LoginForm() {
 
         toast.showToast('Bem-vindo!', `Bem-vindo, ${data.user.email || 'Administrador'}!`)
 
-        // Aguardar mais tempo para garantir que os cookies sejam sincronizados no servidor
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        // Aguardar um pouco para garantir que os cookies sejam sincronizados
+        // Com createBrowserClient do @supabase/ssr, a sincronização é automática
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         // Verificar novamente antes de redirecionar para evitar loops
         const {
