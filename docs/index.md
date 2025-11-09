@@ -10,7 +10,7 @@
 Este projeto é uma plataforma de pedidos digitais para restaurantes, composta por três aplicativos principais:
 1. **Plataforma Web do Cliente** (Interface pública)
 2. **Painel Web do Restaurante** (Área administrativa)
-3. **Aplicativo Desktop de Gestão** (Electron para Windows)
+3. **Aplicativo Desktop de Gestão** (Electron para MacOS)
 
 ---
 

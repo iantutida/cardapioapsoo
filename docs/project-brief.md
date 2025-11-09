@@ -6,7 +6,7 @@
 O "Cardápio APSOO" é uma plataforma de pedidos digitais projetada para restaurantes, com foco em otimizar o fluxo de pedidos para consumo local e retirada. O sistema é composto por três componentes principais:
 1.  **Plataforma Web do Cliente:** Uma interface pública onde os clientes podem navegar pelo cardápio, montar um carrinho, aplicar cupons e finalizar pedidos para retirada ou consumo na mesa.
 2.  **Painel Web do Restaurante:** Uma área administrativa segura para o restaurante configurar a aparência do cardápio, gerenciar produtos, categorias, opcionais, cupons e visualizar um histórico de pedidos e clientes.
-3.  **Aplicativo Desktop de Gestão:** Uma aplicação Electron para Windows que funciona como a estação de recebimento de pedidos do restaurante, fornecendo notificações em tempo real e permitindo à equipe atualizar o status do pedido.
+3.  **Aplicativo Desktop de Gestão:** Uma aplicação Electron para MacOS que funciona como a estação de recebimento de pedidos do restaurante, fornecendo notificações em tempo real e permitindo à equipe atualizar o status do pedido.
 O projeto visa digitalizar e agilizar a operação de pedidos internos, excluindo intencionalmente integrações de pagamento online e logística de entrega para focar na experiência de pedido no local.
 
 ## 2. O Problema

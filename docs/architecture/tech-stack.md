@@ -51,7 +51,7 @@ Todos os três aplicativos (Cliente Web, Admin Web, Desktop Electron) devem ser 
 **Cliente SDK:** `supabase-js`
 
 ### App 3: Estação de Pedidos (Desktop)
-- Aplicativo Electron para Windows
+- Aplicativo Electron para MacOS
 - TypeScript
 - Conexão: `supabase-js` (com Realtime Subscription)
 
