@@ -175,9 +175,8 @@ export function LoginForm() {
 
         toast.showToast('Bem-vindo!', `Bem-vindo, ${data.user.email || 'Administrador'}!`)
 
-        // Aguardar um pouco para garantir que os cookies sejam sincronizados
-        // e fazer uma verificação final antes de redirecionar
-        await new Promise(resolve => setTimeout(resolve, 800))
+        // Aguardar mais tempo para garantir que os cookies sejam sincronizados no servidor
+        await new Promise(resolve => setTimeout(resolve, 1500))
         
         // Verificar novamente antes de redirecionar para evitar loops
         const {
@@ -198,8 +197,8 @@ export function LoginForm() {
           : null
         const redirectUrl = redirectParam || '/admin/dashboard'
         
-        // Usar window.location.href para garantir redirecionamento completo
-        window.location.href = redirectUrl
+        // Usar window.location.replace para evitar histórico e garantir redirect completo
+        window.location.replace(redirectUrl)
       }
     } catch (error) {
       let errorMessage = 'Erro ao fazer login. Tente novamente.'
