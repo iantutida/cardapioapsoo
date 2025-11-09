@@ -26,18 +26,30 @@ export default function LoginPage() {
           return
         }
 
-        hasCheckedRef.current = true
-
+        // Verificar se já está autenticado usando getUser() para validação real
         const {
-          data: { session },
-        } = await supabase.auth.getSession()
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser()
 
-        if (session) {
-          const redirectParam = typeof window !== 'undefined'
-            ? new URLSearchParams(window.location.search).get('redirect')
-            : null
-          const redirectUrl = redirectParam || '/admin/dashboard'
-          window.location.href = redirectUrl
+        if (!userError && user) {
+          // Verificar se é admin antes de redirecionar
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle()
+
+          if (profile?.role === 'admin') {
+            hasCheckedRef.current = true
+            const redirectParam = typeof window !== 'undefined'
+              ? new URLSearchParams(window.location.search).get('redirect')
+              : null
+            const redirectUrl = redirectParam || '/admin/dashboard'
+            // Usar replaceState para evitar loop e depois fazer redirect
+            window.history.replaceState({}, '', redirectUrl)
+            window.location.href = redirectUrl
+          }
         }
       } catch (error) {
         console.error('Erro ao verificar sessão:', error)

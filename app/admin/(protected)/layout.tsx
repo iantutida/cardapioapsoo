@@ -10,30 +10,24 @@ export default async function AdminProtectedLayout({
 }) {
   const supabase = createServerClient()
 
-  const {
-    data: { session },
-    error: sessionError,
-  } = await supabase.auth.getSession()
-
-  if (sessionError || !session) {
-    redirect('/admin/login')
-  }
-
+  // Usar getUser() diretamente para verificação real no servidor
+  // getSession() pode retornar dados não autenticados do cookie
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (userError || !user) {
     redirect('/admin/login')
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
-  if (!profile || profile.role !== 'admin') {
+  if (profileError || !profile || profile.role !== 'admin') {
     redirect('/admin/login')
   }
 

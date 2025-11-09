@@ -132,16 +132,31 @@ export function LoginForm() {
 
         toast.showToast('Bem-vindo!', `Bem-vindo, ${data.user.email || 'Administrador'}!`)
 
+        // Aguardar um pouco para garantir que os cookies sejam sincronizados
+        // e fazer uma verificação final antes de redirecionar
+        await new Promise(resolve => setTimeout(resolve, 800))
+        
+        // Verificar novamente antes de redirecionar para evitar loops
+        const {
+          data: { user: verifiedUser },
+        } = await supabase.auth.getUser()
+
+        if (!verifiedUser) {
+          setErrors({
+            general: 'Erro ao verificar autenticação. Tente novamente.',
+          })
+          setLoading(false)
+          return
+        }
+
         // Obter redirect URL de forma segura
         const redirectParam = typeof window !== 'undefined' 
           ? new URLSearchParams(window.location.search).get('redirect')
           : null
         const redirectUrl = redirectParam || '/admin/dashboard'
         
-        // Usar window.location.href para garantir redirecionamento completo e evitar loops
-        setTimeout(() => {
-          window.location.href = redirectUrl
-        }, 500)
+        // Usar window.location.href para garantir redirecionamento completo
+        window.location.href = redirectUrl
       }
     } catch (error) {
       let errorMessage = 'Erro ao fazer login. Tente novamente.'
